@@ -1,52 +1,27 @@
 @echo off
 
-set PROJECT=sprint-0-
-set TOMCAT=C:\Program Files\Apache Software Foundation\Tomcat 9.0
+echo nettoyage...
+if exist build rmdir /s /q build
+mkdir build\classes
 
-echo ==========================
-echo Compilation...
-echo ==========================
+echo compilation...
 
-if exist build rmdir /S /Q build
+for /r src %%f in (*.java) do (
+    echo %%f>> sources.txt
+)
 
-mkdir build
-
-javac ^
--cp "%TOMCAT%\lib\*" ^
--d build ^
-src\framework\*.java ^
-src\controller\*.java
+javac -cp "lib/*" -d build\classes @sources.txt
 
 if errorlevel 1 (
-    echo ERREUR DE COMPILATION
-    pause
-    exit
+    echo Compilation failed.
+    del sources.txt
+    exit /b 1
 )
 
-echo ==========================
-echo Deploiement...
-echo ==========================
+del sources.txt
 
-if exist "%TOMCAT%\webapps\%PROJECT%" (
-    rmdir /S /Q "%TOMCAT%\webapps\%PROJECT%"
-)
+echo creation du jar...
+jar cf Framework.jar -C build\classes .
 
-mkdir "%TOMCAT%\webapps\%PROJECT%"
-mkdir "%TOMCAT%\webapps\%PROJECT%\WEB-INF"
-mkdir "%TOMCAT%\webapps\%PROJECT%\WEB-INF\classes"
-
-xcopy build "%TOMCAT%\webapps\%PROJECT%\WEB-INF\classes" /E /I /Y
-
-copy WEB-INF\web.xml ^
-"%TOMCAT%\webapps\%PROJECT%\WEB-INF"
-
-echo.
-echo ==========================
-echo DEPLOIEMENT TERMINE
-echo ==========================
-echo.
-echo Tester :
-echo http://localhost:8081/%PROJECT%/users
-echo.
-
+echo termine.
 pause
