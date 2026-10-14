@@ -33,7 +33,7 @@ public class FrontControllerListener implements ServletContextListener {
         String configuredPackage = context.getInitParameter("base-package");
         String packageName = configuredPackage != null && !configuredPackage.isBlank()
                 ? configuredPackage
-                : "tsiresy.main";
+                : "tiavina.main";
 
         String viewPrefix = context.getInitParameter("view-prefix");
         if (viewPrefix == null) {
