@@ -220,28 +220,30 @@ public void processRequest(HttpServletRequest req, HttpServletResponse res)
             }
         }
 
-        private int accessStatus(MethodInfo info, HttpServletRequest req) {
-            RolesAllowed methodRoles = info.method.getAnnotation(RolesAllowed.class);
-            RolesAllowed classRoles = info.controllerClass.getAnnotation(RolesAllowed.class);
-            RolesAllowed roles = methodRoles != null ? methodRoles : classRoles;
-
-            boolean requiresAuthentication = info.method.isAnnotationPresent(Authenticated.class)
-                    || info.controllerClass.isAnnotationPresent(Authenticated.class)
-                    || roles != null;
-
-            if (requiresAuthentication && req.getUserPrincipal() == null) {
-                return HttpServletResponse.SC_UNAUTHORIZED;
-            }
-            if (roles != null) {
-                for (String role : roles.value()) {
-                    if (role != null && !role.isBlank() && req.isUserInRole(role)) {
-                        return HttpServletResponse.SC_OK;
-                    }
-                }
-                return HttpServletResponse.SC_FORBIDDEN;
-            }
-            return HttpServletResponse.SC_OK;
-        }
     }
-}
+
+    }
+
+    private int accessStatus(MethodInfo info, HttpServletRequest req) {
+        RolesAllowed methodRoles = info.method.getAnnotation(RolesAllowed.class);
+        RolesAllowed classRoles = info.controllerClass.getAnnotation(RolesAllowed.class);
+        RolesAllowed roles = methodRoles != null ? methodRoles : classRoles;
+
+        boolean requiresAuthentication = info.method.isAnnotationPresent(Authenticated.class)
+                || info.controllerClass.isAnnotationPresent(Authenticated.class)
+                || roles != null;
+
+        if (requiresAuthentication && req.getUserPrincipal() == null) {
+            return HttpServletResponse.SC_UNAUTHORIZED;
+        }
+        if (roles != null) {
+            for (String role : roles.value()) {
+                if (role != null && !role.isBlank() && req.isUserInRole(role)) {
+                    return HttpServletResponse.SC_OK;
+                }
+            }
+            return HttpServletResponse.SC_FORBIDDEN;
+        }
+        return HttpServletResponse.SC_OK;
+    }
 }
