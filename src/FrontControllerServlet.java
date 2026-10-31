@@ -12,8 +12,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.MultipartConfig;
 import src.annotation.UrlApi;
 
+@MultipartConfig(
+    maxFileSize = 10 * 1024 * 1024,
+    maxRequestSize = 12 * 1024 * 1024
+)
 public class FrontControllerServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")

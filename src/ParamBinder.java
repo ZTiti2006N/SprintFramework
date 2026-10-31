@@ -15,6 +15,7 @@ import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import src.annotation.DateFormat;
 import src.annotation.Numeric;
 import src.annotation.Param;
@@ -39,6 +40,26 @@ public class ParamBinder {
             if (type.isAssignableFrom(HttpServletRequest.class)) { args[i] = req; continue; }
             if (type.isAssignableFrom(HttpServletResponse.class)) { args[i] = res; continue; }
             if (type.isAssignableFrom(HttpSession.class)) { args[i] = req.getSession(); continue; }
+            if (Part.class.isAssignableFrom(type)) {
+                Param paramAnn = p.getAnnotation(Param.class);
+                String fieldName;
+
+                if (paramAnn != null && !paramAnn.name().isBlank()) {
+                    fieldName = paramAnn.name();
+                } else if (paramAnn != null && !paramAnn.value().isBlank()) {
+                    fieldName = paramAnn.value();
+                } else {
+                    fieldName = p.getName();
+                }
+
+                Part part = req.getPart(fieldName);
+                if (part == null || part.getSize() == 0) {
+                    throw new BindingException("Aucun fichier reçu pour le champ : " + fieldName);
+                }
+
+                args[i] = part;
+                continue;
+            }
 
             rejectRequestParam(method, p);
 
